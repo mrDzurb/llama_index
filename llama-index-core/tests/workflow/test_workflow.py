@@ -76,6 +76,9 @@ async def test_workflow_run_step(workflow):
     result = await handler
     assert handler.is_done()
     assert result == "Workflow completed"
+    # there shouldn't be any in progress events
+    for inprogress_list in handler.ctx._in_progress.values():
+        assert len(inprogress_list) == 0
 
 
 @pytest.mark.asyncio()
@@ -217,6 +220,9 @@ async def test_workflow_num_workers():
             ctx.session.send_event(OneTestEvent(test_param="test2"))
             ctx.session.send_event(OneTestEvent(test_param="test3"))
 
+            # send one extra event
+            ctx.session.send_event(AnotherTestEvent(another_test_param="test4"))
+
             return LastEvent()
 
         @step(num_workers=3)
@@ -238,11 +244,21 @@ async def test_workflow_num_workers():
     workflow = NumWorkersWorkflow()
 
     start_time = time.time()
-    result = await workflow.run()
+    handler = workflow.run()
+    result = await handler
     end_time = time.time()
 
     assert workflow.is_done()
-    assert set(result) == {"test1", "test2", "test3"}
+    assert set(result) == {"test1", "test2", "test4"}
+
+    # ctx should have 1 extra event
+    assert (
+        len(handler.ctx._events_buffer["tests.workflow.conftest.AnotherTestEvent"]) == 1
+    )
+
+    # ensure ctx is serializable
+    ctx = handler.ctx
+    ctx.to_dict()
 
     # Check if the execution time is close to 1 second (with some tolerance)
     execution_time = end_time - start_time

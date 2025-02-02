@@ -2,7 +2,13 @@ import logging
 import os
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Type, Union
 
+import openai
 from deprecated import deprecated
+from openai.types.chat import ChatCompletionMessageParam, ChatCompletionMessageToolCall
+from openai.types.chat.chat_completion_chunk import ChoiceDeltaToolCall
+from openai.types.chat.chat_completion_message import ChatCompletionMessage
+from openai.types.chat.chat_completion_token_logprob import ChatCompletionTokenLogprob
+from openai.types.completion_choice import Logprobs
 from tenacity import (
     before_sleep_log,
     retry,
@@ -14,30 +20,36 @@ from tenacity import (
 )
 from tenacity.stop import stop_base
 
-import openai
 from llama_index.core.base.llms.generic_utils import get_from_param_or_env
 from llama_index.core.base.llms.types import (
     ChatMessage,
     ImageBlock,
     LogProb,
+    MessageRole,
     TextBlock,
 )
 from llama_index.core.bridge.pydantic import BaseModel
-from openai.types.chat import ChatCompletionMessageParam, ChatCompletionMessageToolCall
-from openai.types.chat.chat_completion_chunk import ChoiceDeltaToolCall
-from openai.types.chat.chat_completion_message import ChatCompletionMessage
-from openai.types.chat.chat_completion_token_logprob import ChatCompletionTokenLogprob
-from openai.types.completion_choice import Logprobs
 
 DEFAULT_OPENAI_API_TYPE = "open_ai"
 DEFAULT_OPENAI_API_BASE = "https://api.openai.com/v1"
 DEFAULT_OPENAI_API_VERSION = ""
 
 O1_MODELS: Dict[str, int] = {
+    "o1": 200000,
+    "o1-2024-12-17": 200000,
     "o1-preview": 128000,
     "o1-preview-2024-09-12": 128000,
     "o1-mini": 128000,
     "o1-mini-2024-09-12": 128000,
+    "o3-mini": 200000,
+    "o3-mini-2025-01-31": 200000,
+}
+
+O1_MODELS_WITHOUT_FUNCTION_CALLING = {
+    "o1-preview",
+    "o1-preview-2024-09-12",
+    "o1-mini",
+    "o1-mini-2024-09-12",
 }
 
 GPT4_MODELS: Dict[str, int] = {
@@ -245,27 +257,23 @@ def is_function_calling_model(model: str) -> bool:
 
     is_chat_model_ = is_chat_model(model)
     is_old = "0314" in model or "0301" in model
-
-    # TODO: This is temporary for openai's beta
-    is_o1_beta = "o1" in model
+    is_o1_beta = model in O1_MODELS_WITHOUT_FUNCTION_CALLING
 
     return is_chat_model_ and not is_old and not is_o1_beta
 
 
 def to_openai_message_dict(
-    message: ChatMessage, drop_none: bool = False, model: Optional[str] = None
+    message: ChatMessage,
+    drop_none: bool = False,
+    model: Optional[str] = None,
 ) -> ChatCompletionMessageParam:
     """Convert a ChatMessage to an OpenAI message dict."""
     content = []
     content_txt = ""
     for block in message.blocks:
         if isinstance(block, TextBlock):
-            if message.role.value in ("assistant", "tool", "system"):
-                # Despite the docs say otherwise, when role is ASSISTANT, SYSTEM
-                # or TOOL, 'content' cannot be a list and must be string instead.
-                content_txt += block.text
-            else:
-                content.append({"type": "text", "text": block.text})
+            content.append({"type": "text", "text": block.text})
+            content_txt += block.text
         elif isinstance(block, ImageBlock):
             if block.url:
                 content.append(
@@ -287,17 +295,33 @@ def to_openai_message_dict(
             msg = f"Unsupported content block type: {type(block).__name__}"
             raise ValueError(msg)
 
+    # NOTE: Sending a null value (None) for Tool Message to OpenAI will cause error
+    # It's only Allowed to send None if it's an Assistant Message
+    # Reference: https://platform.openai.com/docs/api-reference/chat/create
+    content_txt = (
+        None
+        if content_txt == "" and message.role == MessageRole.ASSISTANT
+        else content_txt
+    )
+
+    # NOTE: Despite what the openai docs say, if the role is ASSISTANT, SYSTEM
+    # or TOOL, 'content' cannot be a list and must be string instead.
+    # Furthermore, if all blocks are text blocks, we can use the content_txt
+    # as the content. This will avoid breaking openai-like APIs.
     message_dict = {
         "role": message.role.value,
-        "content": content_txt
-        if message.role.value in ("assistant", "tool", "system")
-        else content,
+        "content": (
+            content_txt
+            if message.role.value in ("assistant", "tool", "system")
+            or all(isinstance(block, TextBlock) for block in message.blocks)
+            else content
+        ),
     }
 
     # TODO: O1 models do not support system prompts
     if model is not None and model in O1_MODELS:
         if message_dict["role"] == "system":
-            message_dict["role"] = "user"
+            message_dict["role"] = "developer"
 
     # NOTE: openai messages have additional arguments:
     # - function messages have `name`
@@ -320,7 +344,11 @@ def to_openai_message_dicts(
 ) -> List[ChatCompletionMessageParam]:
     """Convert generic messages to OpenAI message dicts."""
     return [
-        to_openai_message_dict(message, drop_none=drop_none, model=model)
+        to_openai_message_dict(
+            message,
+            drop_none=drop_none,
+            model=model,
+        )
         for message in messages
     ]
 

@@ -247,6 +247,7 @@ class Workflow(metaclass=WorkflowMeta):
                                 new_ev = await instrumented_step(**kwargs)
                                 break  # exit the retrying loop
                             except WorkflowDone:
+                                await ctx.remove_from_in_progress(name=name, ev=ev)
                                 raise
                             except Exception as e:
                                 if config.retry_policy is None:
@@ -277,6 +278,7 @@ class Workflow(metaclass=WorkflowMeta):
                                 None, run_task
                             )
                         except WorkflowDone:
+                            await ctx.remove_from_in_progress(name=name, ev=ev)
                             raise
                         except Exception as e:
                             raise WorkflowRuntimeError(
@@ -404,6 +406,11 @@ class Workflow(metaclass=WorkflowMeta):
 
                     # the context is now running
                     ctx.is_running = True
+                else:
+                    # resend in-progress events if already running
+                    for name, evs in ctx._in_progress.items():
+                        for ev in evs:
+                            ctx.send_event(ev, step=name)
 
                 done, unfinished = await asyncio.wait(
                     ctx._tasks,
@@ -474,7 +481,12 @@ class Workflow(metaclass=WorkflowMeta):
             ctx=ctx, checkpoint_callback=checkpoint_callback, **kwargs
         )
 
-        ctx.send_event(checkpoint.output_event)
+        # only kick off the workflow if there are no in-progress events
+        # in-progress events are already started in self.run()
+        num_in_progress = sum(len(v) for v in ctx._in_progress.values())
+        if num_in_progress == 0 and handler.ctx is not None:
+            handler.ctx.send_event(checkpoint.output_event)
+
         return handler
 
     def is_done(self) -> bool:

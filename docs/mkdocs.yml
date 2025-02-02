@@ -50,6 +50,7 @@ nav:
           - Enhancing with LlamaParse: ./understanding/agent/llamaparse.md
           - Memory: ./understanding/agent/memory.md
           - Adding other tools: ./understanding/agent/tools.md
+          - Multi-agent workflows: ./understanding/agent/multi_agents.md
       - Building Workflows:
           - Introduction to workflows: ./understanding/workflows/index.md
           - A basic workflow: ./understanding/workflows/basic_flow.md
@@ -97,6 +98,8 @@ nav:
           - ./examples/agent/agent_runner/agent_runner.ipynb
           - ./examples/agent/agent_runner/agent_runner_rag_controllable.ipynb
           - ./examples/agent/agent_runner/query_pipeline_agent.ipynb
+          - ./examples/agent/agent_workflow_basic.ipynb
+          - ./examples/agent/agent_workflow_multi.ipynb
           - ./examples/agent/agentic_rag_using_vertex_ai.ipynb
           - ./examples/agent/agentic_rag_with_llamaindex_and_vertexai_managed_index.ipynb
           - ./examples/agent/anthropic_agent.ipynb
@@ -113,6 +116,7 @@ nav:
           - ./examples/agent/multi_document_agents-v1.ipynb
           - ./examples/agent/multi_document_agents.ipynb
           - ./examples/agent/nvidia_agent.ipynb
+          - ./examples/agent/nvidia_document_research_assistant_for_blog_creation.ipynb
           - ./examples/agent/nvidia_sub_question_query_engine.ipynb
           - ./examples/agent/openai_agent.ipynb
           - ./examples/agent/openai_agent_context_retrieval.ipynb
@@ -151,6 +155,7 @@ nav:
           - ./examples/cookbooks/contextual_retrieval.ipynb
           - ./examples/cookbooks/crewai_llamaindex.ipynb
           - ./examples/cookbooks/llama3_cookbook.ipynb
+          - ./examples/cookbooks/llama3_cookbook_gaudi.ipynb
           - ./examples/cookbooks/llama3_cookbook_groq.ipynb
           - ./examples/cookbooks/llama3_cookbook_ollama_replicate.ipynb
           - ./examples/cookbooks/mistralai.ipynb
@@ -222,6 +227,7 @@ nav:
           - ./examples/docstore/FirestoreDemo.ipynb
           - ./examples/docstore/MongoDocstoreDemo.ipynb
           - ./examples/docstore/RedisDocstoreIndexStoreDemo.ipynb
+          - ./examples/docstore/TablestoreDocstoreDemo.ipynb
       - Embeddings:
           - ./examples/embeddings/Anyscale.ipynb
           - ./examples/embeddings/Langchain.ipynb
@@ -256,7 +262,6 @@ nav:
           - ./examples/embeddings/nomic.ipynb
           - ./examples/embeddings/nvidia.ipynb
           - ./examples/embeddings/oci_genai.ipynb
-          - ./examples/embeddings/octoai.ipynb
           - ./examples/embeddings/ollama_embedding.ipynb
           - ./examples/embeddings/openvino.ipynb
           - ./examples/embeddings/optimum_intel.ipynb
@@ -312,6 +317,7 @@ nav:
           - ./examples/ingestion/document_management_pipeline.ipynb
           - ./examples/ingestion/ingestion_gdrive.ipynb
           - ./examples/ingestion/parallel_execution_ingestion_pipeline.ipynb
+          - ./examples/ingestion/redis_ingestion_pipeline.ipynb
       - LLMs:
           - ./examples/llm/ai21.ipynb
           - ./examples/llm/alephalpha.ipynb
@@ -329,6 +335,7 @@ nav:
           - ./examples/llm/dashscope.ipynb
           - ./examples/llm/databricks.ipynb
           - ./examples/llm/deepinfra.ipynb
+          - ./examples/llm/deepseek.ipynb
           - ./examples/llm/everlyai.ipynb
           - ./examples/llm/fireworks.ipynb
           - ./examples/llm/fireworks_cookbook.ipynb
@@ -343,9 +350,9 @@ nav:
           - ./examples/llm/langchain.ipynb
           - ./examples/llm/litellm.ipynb
           - ./examples/llm/llama_2.ipynb
-          - ./examples/llm/llama_2_llama_cpp.ipynb
           - ./examples/llm/llama_2_rap_battle.ipynb
           - ./examples/llm/llama_api.ipynb
+          - ./examples/llm/llama_cpp.ipynb
           - ./examples/llm/llamafile.ipynb
           - ./examples/llm/llm_predictor.ipynb
           - ./examples/llm/lmstudio.ipynb
@@ -384,9 +391,7 @@ nav:
           - ./examples/llm/rungpt.ipynb
           - ./examples/llm/sagemaker_endpoint_llm.ipynb
           - ./examples/llm/sambanovasystems.ipynb
-          - ./examples/llm/solar.ipynb
           - ./examples/llm/together.ipynb
-          - ./examples/llm/unify.ipynb
           - ./examples/llm/upstage.ipynb
           - ./examples/llm/vertex.ipynb
           - ./examples/llm/vicuna.ipynb
@@ -423,6 +428,7 @@ nav:
       - Memory:
           - ./examples/memory/Mem0Memory.ipynb
       - Metadata Extractors:
+          - ./examples/metadata_extraction/DocumentContextExtractor.ipynb
           - ./examples/metadata_extraction/EntityExtractionClimate.ipynb
           - ./examples/metadata_extraction/MarvinMetadataExtractorDemo.ipynb
           - ./examples/metadata_extraction/MetadataExtractionSEC.ipynb
@@ -448,6 +454,7 @@ nav:
           - ./examples/multi_modal/multi_modal_retrieval.ipynb
           - ./examples/multi_modal/multi_modal_video_RAG.ipynb
           - ./examples/multi_modal/multi_modal_videorag_videodb.ipynb
+          - ./examples/multi_modal/multimodal_rag_guardrail_gemini_llmguard_llmguard.ipynb
           - ./examples/multi_modal/nebius_multi_modal.ipynb
           - ./examples/multi_modal/nvidia_multi_modal.ipynb
           - ./examples/multi_modal/ollama_cookbook.ipynb
@@ -642,7 +649,6 @@ nav:
           - ./examples/vector_stores/LanternAutoRetriever.ipynb
           - ./examples/vector_stores/LanternIndexDemo.ipynb
           - ./examples/vector_stores/LindormDemo.ipynb
-          - ./examples/vector_stores/MetalIndexDemo.ipynb
           - ./examples/vector_stores/MilvusHybridIndexDemo.ipynb
           - ./examples/vector_stores/MilvusIndexDemo.ipynb
           - ./examples/vector_stores/MilvusOperatorFunctionDemo.ipynb
@@ -852,6 +858,7 @@ nav:
           - ./api_reference/agent/openai.md
           - ./api_reference/agent/openai_legacy.md
           - ./api_reference/agent/react.md
+          - ./api_reference/agent/workflow.md
       - Callbacks:
           - ./api_reference/callbacks/agentops.md
           - ./api_reference/callbacks/aim.md
@@ -922,6 +929,7 @@ nav:
           - ./api_reference/embeddings/oci_genai.md
           - ./api_reference/embeddings/octoai.md
           - ./api_reference/embeddings/ollama.md
+          - ./api_reference/embeddings/opea.md
           - ./api_reference/embeddings/openai.md
           - ./api_reference/embeddings/oracleai.md
           - ./api_reference/embeddings/premai.md
@@ -953,6 +961,8 @@ nav:
           - ./api_reference/evaluation/retrieval.md
           - ./api_reference/evaluation/semantic_similarity.md
           - ./api_reference/evaluation/tonic_validate.md
+      - Graph RAG:
+          - ./api_reference/graph_rag/cognee.md
       - Indexes:
           - ./api_reference/indices/bge_m3.md
           - ./api_reference/indices/colbert.md
@@ -994,10 +1004,12 @@ nav:
           - ./api_reference/llms/clarifai.md
           - ./api_reference/llms/cleanlab.md
           - ./api_reference/llms/cohere.md
+          - ./api_reference/llms/cortex.md
           - ./api_reference/llms/custom_llm.md
           - ./api_reference/llms/dashscope.md
           - ./api_reference/llms/databricks.md
           - ./api_reference/llms/deepinfra.md
+          - ./api_reference/llms/deepseek.md
           - ./api_reference/llms/everlyai.md
           - ./api_reference/llms/fireworks.md
           - ./api_reference/llms/friendli.md
@@ -1011,6 +1023,7 @@ nav:
           - ./api_reference/llms/ibm.md
           - ./api_reference/llms/index.md
           - ./api_reference/llms/ipex_llm.md
+          - ./api_reference/llms/keywordsai.md
           - ./api_reference/llms/konko.md
           - ./api_reference/llms/langchain.md
           - ./api_reference/llms/litellm.md
@@ -1034,6 +1047,7 @@ nav:
           - ./api_reference/llms/oci_genai.md
           - ./api_reference/llms/octoai.md
           - ./api_reference/llms/ollama.md
+          - ./api_reference/llms/opea.md
           - ./api_reference/llms/openai.md
           - ./api_reference/llms/openai_like.md
           - ./api_reference/llms/openllm.md
@@ -1055,6 +1069,7 @@ nav:
           - ./api_reference/llms/sambanovasystems.md
           - ./api_reference/llms/siliconflow.md
           - ./api_reference/llms/solar.md
+          - ./api_reference/llms/stepfun.md
           - ./api_reference/llms/text_generation_inference.md
           - ./api_reference/llms/together.md
           - ./api_reference/llms/unify.md
@@ -1141,6 +1156,7 @@ nav:
           - ./api_reference/memory/simple_composable_memory.md
           - ./api_reference/memory/vector_memory.md
       - Metadata Extractors:
+          - ./api_reference/extractors/documentcontext.md
           - ./api_reference/extractors/entity.md
           - ./api_reference/extractors/index.md
           - ./api_reference/extractors/keyword.md
@@ -1154,6 +1170,7 @@ nav:
       - Multi-Modal LLMs:
           - ./api_reference/multi_modal_llms/anthropic.md
           - ./api_reference/multi_modal_llms/azure_openai.md
+          - ./api_reference/multi_modal_llms/bedrock.md
           - ./api_reference/multi_modal_llms/dashscope.md
           - ./api_reference/multi_modal_llms/gemini.md
           - ./api_reference/multi_modal_llms/huggingface.md
@@ -1486,9 +1503,11 @@ nav:
               - ./api_reference/storage/chat_store/postgres.md
               - ./api_reference/storage/chat_store/redis.md
               - ./api_reference/storage/chat_store/simple.md
+              - ./api_reference/storage/chat_store/tablestore.md
               - ./api_reference/storage/chat_store/upstash.md
           - Docstore:
               - ./api_reference/storage/docstore/azure.md
+              - ./api_reference/storage/docstore/azurecosmosnosql.md
               - ./api_reference/storage/docstore/couchbase.md
               - ./api_reference/storage/docstore/dynamodb.md
               - ./api_reference/storage/docstore/elasticsearch.md
@@ -1498,6 +1517,7 @@ nav:
               - ./api_reference/storage/docstore/postgres.md
               - ./api_reference/storage/docstore/redis.md
               - ./api_reference/storage/docstore/simple.md
+              - ./api_reference/storage/docstore/tablestore.md
           - Graph Stores:
               - ./api_reference/storage/graph_stores/falkordb.md
               - ./api_reference/storage/graph_stores/index.md
@@ -1520,6 +1540,7 @@ nav:
               - ./api_reference/storage/index_store/postgres.md
               - ./api_reference/storage/index_store/redis.md
               - ./api_reference/storage/index_store/simple.md
+              - ./api_reference/storage/index_store/tablestore.md
           - Kvstore:
               - ./api_reference/storage/kvstore/azure.md
               - ./api_reference/storage/kvstore/azurecosmosnosql.md
@@ -1533,6 +1554,7 @@ nav:
               - ./api_reference/storage/kvstore/redis.md
               - ./api_reference/storage/kvstore/s3.md
               - ./api_reference/storage/kvstore/simple.md
+              - ./api_reference/storage/kvstore/tablestore.md
           - Storage:
               - ./api_reference/storage/storage_context.md
           - Vector Store:
@@ -1631,6 +1653,7 @@ nav:
           - ./api_reference/tools/index.md
           - ./api_reference/tools/ionic_shopping.md
           - ./api_reference/tools/jina.md
+          - ./api_reference/tools/linkup_research.md
           - ./api_reference/tools/load_and_search.md
           - ./api_reference/tools/metaphor.md
           - ./api_reference/tools/multion.md
@@ -1647,6 +1670,7 @@ nav:
           - ./api_reference/tools/requests.md
           - ./api_reference/tools/retriever.md
           - ./api_reference/tools/salesforce.md
+          - ./api_reference/tools/scrapegraph.md
           - ./api_reference/tools/shopify.md
           - ./api_reference/tools/slack.md
           - ./api_reference/tools/tavily_research.md
@@ -2308,6 +2332,20 @@ plugins:
             - ../llama-index-integrations/llms/llama-index-llms-nebius
             - ../llama-index-integrations/postprocessor/llama-index-postprocessor-bedrock-rerank
             - ../llama-index-integrations/postprocessor/llama-index-postprocessor-pinecone-native-rerank
+            - ../llama-index-integrations/tools/llama-index-tools-scrapegraph
+            - ../llama-index-integrations/graph_rag/llama-index-graph-rag-cognee
+            - ../llama-index-integrations/llms/llama-index-llms-keywordsai
+            - ../llama-index-integrations/embeddings/llama-index-embeddings-opea
+            - ../llama-index-integrations/multi_modal_llms/llama-index-multi-modal-llms-bedrock
+            - ../llama-index-integrations/storage/kvstore/llama-index-storage-kvstore-tablestore
+            - ../llama-index-integrations/storage/docstore/llama-index-storage-docstore-tablestore
+            - ../llama-index-integrations/storage/index_store/llama-index-storage-index-store-tablestore
+            - ../llama-index-integrations/storage/chat_store/llama-index-storage-chat-store-tablestore
+            - ../llama-index-integrations/llms/llama-index-llms-opea
+            - ../llama-index-integrations/llms/llama-index-llms-stepfun
+            - ../llama-index-integrations/tools/llama-index-tools-linkup-research
+            - ../llama-index-integrations/llms/llama-index-llms-deepseek
+            - ../llama-index-integrations/llms/llama-index-llms-cortex
   - redirects:
       redirect_maps:
         ./api/llama_index.vector_stores.MongoDBAtlasVectorSearch.html: api_reference/storage/vector_store/mongodb.md
@@ -2572,7 +2610,7 @@ plugins:
         ./examples/llm/langchain.html: https://docs.llamaindex.ai/en/stable/examples/llm/langchain/
         ./examples/llm/litellm.html: https://docs.llamaindex.ai/en/stable/examples/llm/litellm/
         ./examples/llm/llama_2.html: https://docs.llamaindex.ai/en/stable/examples/llm/llama_2/
-        ./examples/llm/llama_2_llama_cpp.html: https://docs.llamaindex.ai/en/stable/examples/llm/llama_2_llama_cpp/
+        ./examples/llm/llama_2_llama_cpp.html: https://docs.llamaindex.ai/en/stable/examples/llm/llama_cpp/
         ./examples/llm/llama_2_rap_battle.html: https://docs.llamaindex.ai/en/stable/examples/llm/llama_2_rap_battle/
         ./examples/llm/llama_api.html: https://docs.llamaindex.ai/en/stable/examples/llm/llama_api/
         ./examples/llm/llamafile.html: https://docs.llamaindex.ai/en/stable/examples/llm/llamafile/

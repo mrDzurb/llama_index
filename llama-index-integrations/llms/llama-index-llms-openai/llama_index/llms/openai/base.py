@@ -7,6 +7,7 @@ from typing import (
     Dict,
     Generator,
     List,
+    Literal,
     Optional,
     Protocol,
     Sequence,
@@ -170,7 +171,7 @@ class OpenAI(FunctionCallingLLM):
         default=DEFAULT_TEMPERATURE,
         description="The temperature to use during generation.",
         ge=0.0,
-        le=1.0,
+        le=2.0,
     )
     max_tokens: Optional[int] = Field(
         description="The maximum number of tokens to generate.",
@@ -217,6 +218,10 @@ class OpenAI(FunctionCallingLLM):
         default=False,
         description="Whether to use strict mode for invoking tools/using schemas.",
     )
+    reasoning_effort: Literal["low", "medium", "high"] = Field(
+        default="medium",
+        description="The effort to use for reasoning models.",
+    )
 
     _client: Optional[SyncOpenAI] = PrivateAttr()
     _aclient: Optional[AsyncOpenAI] = PrivateAttr()
@@ -248,6 +253,7 @@ class OpenAI(FunctionCallingLLM):
         pydantic_program_mode: PydanticProgramMode = PydanticProgramMode.DEFAULT,
         output_parser: Optional[BaseOutputParser] = None,
         strict: bool = False,
+        reasoning_effort: Literal["low", "medium", "high"] = "medium",
         **kwargs: Any,
     ) -> None:
         additional_kwargs = additional_kwargs or {}
@@ -281,6 +287,7 @@ class OpenAI(FunctionCallingLLM):
             pydantic_program_mode=pydantic_program_mode,
             output_parser=output_parser,
             strict=strict,
+            reasoning_effort=reasoning_effort,
             **kwargs,
         )
 
@@ -417,13 +424,25 @@ class OpenAI(FunctionCallingLLM):
         all_kwargs = {**base_kwargs, **self.additional_kwargs}
         if "stream" not in all_kwargs and "stream_options" in all_kwargs:
             del all_kwargs["stream_options"]
+        if self.model in O1_MODELS and base_kwargs["max_tokens"] is not None:
+            # O1 models use max_completion_tokens instead of max_tokens
+            all_kwargs["max_completion_tokens"] = all_kwargs.get(
+                "max_completion_tokens", all_kwargs["max_tokens"]
+            )
+            all_kwargs.pop("max_tokens", None)
+        if self.model in O1_MODELS:
+            # O1 models support reasoning_effort of low, medium, high
+            all_kwargs["reasoning_effort"] = self.reasoning_effort
 
         return all_kwargs
 
     @llm_retry_decorator
     def _chat(self, messages: Sequence[ChatMessage], **kwargs: Any) -> ChatResponse:
         client = self._get_client()
-        message_dicts = to_openai_message_dicts(messages, model=self.model)
+        message_dicts = to_openai_message_dicts(
+            messages,
+            model=self.model,
+        )
 
         if self.reuse_client:
             response = client.chat.completions.create(
@@ -458,7 +477,10 @@ class OpenAI(FunctionCallingLLM):
         self, messages: Sequence[ChatMessage], **kwargs: Any
     ) -> ChatResponseGen:
         client = self._get_client()
-        message_dicts = to_openai_message_dicts(messages, model=self.model)
+        message_dicts = to_openai_message_dicts(
+            messages,
+            model=self.model,
+        )
 
         def gen() -> ChatResponseGen:
             content = ""
@@ -668,7 +690,10 @@ class OpenAI(FunctionCallingLLM):
         self, messages: Sequence[ChatMessage], **kwargs: Any
     ) -> ChatResponse:
         aclient = self._get_aclient()
-        message_dicts = to_openai_message_dicts(messages, model=self.model)
+        message_dicts = to_openai_message_dicts(
+            messages,
+            model=self.model,
+        )
 
         if self.reuse_client:
             response = await aclient.chat.completions.create(
@@ -701,7 +726,10 @@ class OpenAI(FunctionCallingLLM):
         self, messages: Sequence[ChatMessage], **kwargs: Any
     ) -> ChatResponseAsyncGen:
         aclient = self._get_aclient()
-        message_dicts = to_openai_message_dicts(messages, model=self.model)
+        message_dicts = to_openai_message_dicts(
+            messages,
+            model=self.model,
+        )
 
         async def gen() -> ChatResponseAsyncGen:
             content = ""
